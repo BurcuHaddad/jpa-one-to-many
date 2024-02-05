@@ -1,12 +1,15 @@
 package com.devbh.cruddemo;
 
 import com.devbh.cruddemo.dao.AppDao;
+import com.devbh.cruddemo.entity.Course;
 import com.devbh.cruddemo.entity.Instructor;
 import com.devbh.cruddemo.entity.InstructorDetail;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+
+import java.util.List;
 
 @SpringBootApplication
 public class CruddemoApplication {
@@ -26,12 +29,80 @@ public class CruddemoApplication {
 			
 			//findInstructorDetail(appDao);
 
-			deleteInstructorDetail(appDao);
+			//deleteInstructorDetail(appDao);
+			
+			//createInstructorWithCourses(appDao);
+
+			//findInstructorWithCourses(appDao);
+
+			findCoursesForInstructor(appDao);
 		};
 	}
 
+	private void findCoursesForInstructor(AppDao appDao) {
+		int theId = 1;
+		// find instructor
+		System.out.println("Finding instructor id: " + theId);
+
+		Instructor tempInstructor = appDao.findInstructorById(theId);
+
+		System.out.println("tempInstructor: " + tempInstructor);
+
+		// find courses for instructor
+		System.out.println("Finding courses for instructor id: " + theId);
+		List<Course> courses = appDao.findCourseByInstructorId(theId);
+
+		// associate the objects
+		tempInstructor.setCourses(courses);
+
+		System.out.println("the associated courses: " + tempInstructor.getCourses());
+
+		System.out.println("Done!");
+	}
+
+	private void findInstructorWithCourses(AppDao appDao) {
+		int theId = 1;
+		System.out.println("Finding instructor id: " + theId);
+
+		Instructor tempInstructor = appDao.findInstructorById(theId);
+
+		System.out.println("tempInstructor: " + tempInstructor);
+		System.out.println("the associated courses: " + tempInstructor.getCourses());
+		System.out.println("Done!");
+	}
+
+	private void createInstructorWithCourses(AppDao appDao) {
+		// create the instructor
+		Instructor tempInstructor =
+				new Instructor("Susan", "Public", "susan.public@bhdev.com");
+
+		//create the instructor detail
+		InstructorDetail tempInstructorDetail =
+				new InstructorDetail("http://www.youtube.com", "Video Games");
+
+		// associate the objects
+		tempInstructor.setInstructorDetail(tempInstructorDetail);
+
+		// create some courses
+		Course tempCourse1 = new Course("Air Guitar - The Ultimate Guide");
+		Course tempCourse2 = new Course("The Pinball Masterclass");
+
+		// add course to instructor
+		tempInstructor.add(tempCourse1);
+		tempInstructor.add(tempCourse2);
+
+		// save the instructor
+		//NOTE: this will ALSO save the course because of CascadeType.PERSIST
+		System.out.println("Saving instructor: " + tempInstructor);
+		System.out.println("The courses: " + tempInstructor.getCourses());
+		appDao.save(tempInstructor);
+
+		System.out.println("Done!");
+
+	}
+
 	private void deleteInstructorDetail(AppDao appDao) {
-		int theId = 3;
+		int theId = 3 ;
 		System.out.println("Deleting instructor detail id: " + theId);
 		appDao.deleteInstructorDetailById(theId);
 		System.out.println("Done!");
